@@ -20,6 +20,7 @@ public class DaniTechGameObjectManager : MonoBehaviour
 
     // 게임 오브젝트 매니저가 살아있는 동안, 이 플레이어를 보관(캐싱)해둔다
     private DaniTech_2DPlayer _localPlayer;
+    private Std_2DPlayer _localPlayer_Std;
 
     private void Awake()
     {
@@ -30,6 +31,11 @@ public class DaniTechGameObjectManager : MonoBehaviour
     public void RegisterLocalPlayer(DaniTech_2DPlayer localPlayer)
     {
         _localPlayer = localPlayer;
+    }
+
+    public void RegisterLocalPlayer_Std(Std_2DPlayer localPlayer_Std)
+    {
+        _localPlayer_Std = localPlayer_Std;
     }
 
     // 프로퍼티 기능이 있긴 하지만, 그래도 그 프로퍼티를 직접 참조하는 것보다는 Get함수를 한정적으로 사용
@@ -45,6 +51,15 @@ public class DaniTechGameObjectManager : MonoBehaviour
         return _localPlayer;
     }
 
+    public Std_2DPlayer GetLocalPlayer_Std()
+    {
+        if(_localPlayer_Std == null)
+        {
+            Debug.LogError("등록된 플레이어가 없는데! 참조하려고 시도하고 있습니다!!");
+            return null;
+        }
+        return _localPlayer_Std;
+    }
 
     public void RequestSpawnEnemy()
     {

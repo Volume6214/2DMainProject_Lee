@@ -1,22 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
-// +) 어떤 컴포넌트가 필수로 필요하다는 것을 강제할 수 있다
 [RequireComponent(typeof(Rigidbody2D))]
-public class DaniTech_2DPlayer : MonoBehaviour
+public class Std_2DPlayer : MonoBehaviour
 {
     [Header("이동 설정")]
     [SerializeField] private float _moveSpeed = 8f;
-    [SerializeField] private float _jumpForce = 12f;
+    [SerializeField] private float _jumpForce = 10f;
 
-    [Header("지면 체크 설정")]
-    [SerializeField] private Transform _groundCheck;    // 발 밑에 배치할 빈 오브젝트
-    [SerializeField] private float _checkRadius = 0.5f; // 체크 범위
-    [SerializeField] private LayerMask _groundLayer;    // 지면으로 인식할 레이어 (Platforms 등)
+    [Header("지면 체크")]
+    [SerializeField] private Transform _groundCheck;
+    [SerializeField] private float _groundCheckRadius = 0.5f;
+    [SerializeField] private LayerMask _groundLayer;
 
     [Header("애니메이터")]
-    [SerializeField] private DaniTech_2DAnimatorController AnimatorController_Entity;
+    [SerializeField] private Std_2DAnimatorController AnimatorController_Entity;
 
     [Header("스킬")]
     [SerializeField] private Collider2D Collider_PlayerNormalAttack;
@@ -27,119 +25,99 @@ public class DaniTech_2DPlayer : MonoBehaviour
     [SerializeField] private int _playerHp = 1000;
     [SerializeField] private int _playerBaseAtk = 100;
 
-
-    // 우선 직접 들고 있다가 추후에 UI매니저한테 요청하도록 개선해볼 것
-    [SerializeField] private DaniTech_ScoreUI _scoreUI;
+    [SerializeField] private  Std_ScoreUI scoreUI;
 
     private Rigidbody2D _rigidBody;
     private bool _isGrounded;
     private float _horizontalInput;
-    private bool _lookRight = true;
+    private bool _lookRight = false;
     private bool _isSkillUsing = false;
 
-    // 추후에는 이런 데이터가 저장될 수 있도록 UI에 있는 것보다 한곳으로 모여지는게 좋다
     private int _currentScore;
 
-    // 스킬 관련 =====================================================================
     public enum ViewType { SideView, TopDown, Isometric }
     public ViewType _currentView = ViewType.SideView;
-    public Vector2 _lookDirection = Vector2.up; // 플레이어가 바라보고 있는 방향
+    public Vector2 _lookDirection = Vector2.up;
 
-    private Vector2 _lastOverlapOffset;
+    public Vector2 _lastOverlapOffset;
     private float _lastOverlapRadius;
     private bool _isOverlapSkillVisible = false;
 
-    void Awake()
+    private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
 
-        // 2D 캐릭터가 물리 충돌 시 회전해서 넘어지는 것 방지
         _rigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
         Collider_PlayerNormalAttack.gameObject.SetActive(false);
     }
 
     private void Start()
     {
-        // 나 스스로를 등록한다. -> 씬에 있는 그 2D 플레이어가 등록됨
-        DaniTechGameObjectManager.Inst.RegisterLocalPlayer(this);
+        DaniTechGameObjectManager.Inst.RegisterLocalPlayer_Std(this);
     }
 
-    void Update()
+    private void Update()
     {
-        // 1. 입력 받기 (Update에서 수행)
         _horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // 2. 점프 입력
         if (Input.GetButtonDown("Jump") && _isGrounded)
         {
             Jump();
         }
 
-        // 3. 캐릭터 방향 전환 (Flip)
         if (_horizontalInput > 0 && !_lookRight)
         {
             Flip();
         }
-        else if (_horizontalInput < 0 && _lookRight) 
-        { 
-            Flip(); 
+        else if (_horizontalInput < 0 && _lookRight)
+        {
+            Flip();
         }
 
-        // 이동을 한다라는 판정만 우선 해봅시다
-        bool isMoving = (_horizontalInput != 0);
-        ChangePlayerState(isMoving ? DaniTech_EntityAnimState.Walk : DaniTech_EntityAnimState.Idle);
+        bool isWalk = (_horizontalInput != 0);
+        ChangePlayerState(isWalk ? Std_2DEntityAnimState.Walk : Std_2DEntityAnimState.Idle);
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.K))
         {
             UseNormalAttack();
         }
-
     }
 
-    private void ChangePlayerState(DaniTech_EntityAnimState newState)
+    private void ChangePlayerState(Std_2DEntityAnimState newState)
     {
-        // 이런 곳에 UI나 플레이어의 별도 처리를 넣어줄 수도 있다
-
-
-        // 우선 애니메이션만 바꿔 봅시다
         AnimatorController_Entity.SetState(newState);
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        // 4. 지면 체크 (물리 연산 전 수행)
-        _isGrounded = Physics2D.OverlapCircle(_groundCheck.position, _checkRadius, _groundLayer);
+        _isGrounded = Physics2D.OverlapCircle(_groundCheck.position, _groundCheckRadius, _groundLayer);
 
-        // 5. 좌우 이동 처리
-        Move();
+        Walk();
     }
 
-    void Move()
+    void Walk()
     {
-        // Y축 속도는 유지하면서 X축 속도만 변경 (관성 유지)
         _rigidBody.linearVelocity = new Vector2(_horizontalInput * _moveSpeed, _rigidBody.linearVelocity.y);
     }
 
     void Jump()
     {
-        // 순간적인 힘을 위로 가함
         _rigidBody.linearVelocity = new Vector2(_rigidBody.linearVelocity.x, _jumpForce);
     }
 
     void Flip()
     {
         _lookRight = !_lookRight;
-        Vector3 scaler = transform.localScale;
-        scaler.x *= -1;
-        transform.localScale = scaler;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 
-    // 6) 적 충돌 시 처리를 해보자
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // 6-1) 플레이어의 > 콜리전에 충돌한 객체가 어떤 Tag인지 1차 검사한다.
-            // 지면 같은 오브젝트와 점프시 충돌이 계속 오므로 이렇게 태그로 먼저 비교하는게 좋다
-            // 중단점을 찍어보면서 확인 추천
+        // 지면 같은 오브젝트와 점프시 충돌이 계속 오므로 이렇게 태그로 먼저 비교하는게 좋다
+        // 중단점을 찍어보면서 확인 추천
         if (collision.gameObject.CompareTag("Enemy") == false)
         {
             return;
@@ -162,42 +140,33 @@ public class DaniTech_2DPlayer : MonoBehaviour
 
     private void AddGameScore()
     {
-        // 7) 여기서 맥락 -> UI를 갱신해주기 위해 과연 플레이어가 이렇게 UI를 직접
-            // 알고 있는게 좋은걸까?
-
-        _currentScore++;
-        _scoreUI.AddGameScore(_currentScore);
+        _currentScore += 100;
+        scoreUI.AddGameScore(_currentScore);
     }
 
     public bool CheckSkillUseable(bool isShowMsg = true)
     {
-        // 원하는 스킬의 사용 가능 조건 체크들이 더 많이 들어가게 된다
-        // 우선은 중복스킬이 사용 되는지 안되는지 먼저 체크
-        if(_isSkillUsing == true)
+        if (_isSkillUsing == true)
         {
-            if(isShowMsg == true)
+            if (isShowMsg == true)
             {
                 DaniTechUIManager.Instance.OpenSimplePopup("스킬이 이미 사용중입니다");
             }
+
             return false;
         }
 
         return true;
     }
 
-
-
     public void UseNormalAttack()
     {
-        if (CheckSkillUseable(isShowMsg:false) == false) return;
-  
+        if (CheckSkillUseable(isShowMsg: false) == false) return;
 
-        ChangePlayerState(DaniTech_EntityAnimState.Atk);
+        ChangePlayerState(Std_2DEntityAnimState.Atk);
         Collider_PlayerNormalAttack.gameObject.SetActive(true);
         StartCoroutine(CoStartNormalAttack());
-
     }
-
     public void UseFirstSkill()
     {
         if (CheckSkillUseable() == false) return;
@@ -226,7 +195,7 @@ public class DaniTech_2DPlayer : MonoBehaviour
         if (gObj == null) return;
 
         var skillProjectileComponent = gObj.GetComponent<DaniTech_SkillProjectile>();
-        if(skillProjectileComponent == null) return;
+        if (skillProjectileComponent == null) return;
 
         var tag = this.gameObject.tag;
         skillProjectileComponent.InitSkillObject(0, _lookRight, this.transform.position, 500, tag, OnMonsterCollied);
@@ -313,7 +282,6 @@ public class DaniTech_2DPlayer : MonoBehaviour
 
         if (_playerHp < 0)
         {
-            // 죽음 처리를 여기서 해두고
             PlayerDie();
         }
     }
@@ -328,10 +296,10 @@ public class DaniTech_2DPlayer : MonoBehaviour
         if (_groundCheck != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(_groundCheck.position, _checkRadius);
+            Gizmos.DrawWireSphere(_groundCheck.position, _groundCheckRadius);
         }
 
-        Gizmos.color = new Color(1f, 1f, 0f, 0.5f); // 반투명 노란색
+        Gizmos.color = new Color(1f, 1f, 0f, 0.5f); 
         Vector2 adjustedDir = GetAdjustedDirection(_lookDirection);
         Vector3 center = transform.position + new Vector3(adjustedDir.x * _lastOverlapOffset.x, adjustedDir.y * _lastOverlapOffset.y, 0);
         Gizmos.DrawWireSphere(center, _lastOverlapRadius);
