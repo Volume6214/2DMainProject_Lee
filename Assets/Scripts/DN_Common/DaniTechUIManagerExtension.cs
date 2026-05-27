@@ -24,6 +24,7 @@ public enum DaniTechUIType
     StdLobbyUI,
     StdMainUI,
     StdMainUITemp,
+    StashInventoryUI,
 }
 
 public static class DaniTechUIManagerExtension

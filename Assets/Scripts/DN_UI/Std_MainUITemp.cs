@@ -1,16 +1,23 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Std_MainUITemp : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private DaniTechUIButton Button_StashInventory;
+    [SerializeField] private DaniTechUIButton Button_Close_StashInventory;
+
+    private void OnEnable()
     {
-        
+        Button_StashInventory.BindOnClickButtonEvent(Onclick_StashInventory);
+        Button_Close_StashInventory.BindOnClickButtonEvent(Onclick_Close_StashInventory);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Onclick_StashInventory()
     {
-        
+        DaniTechUIManager.Instance.OpenContentUI(DaniTechUIType.StashInventoryUI);
+    }
+
+    private void Onclick_Close_StashInventory()
+    {
+        DaniTechUIManager.Instance.CloseContentUI(DaniTechUIType.StashInventoryUI);
     }
 }
