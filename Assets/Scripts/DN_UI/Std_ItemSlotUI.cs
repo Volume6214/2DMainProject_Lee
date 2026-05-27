@@ -7,6 +7,7 @@ public class Std_ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Transform _originalParent;
     private CanvasGroup _canvasGroup;
     public int ItemSize = 1;
+    public int CurrentSlotIndex = -1;
 
     private void Awake()
     {
@@ -15,6 +16,12 @@ public class Std_ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (CurrentSlotIndex != -1)
+        {
+            StdInventoryManager.Instance.RemoveItem(CurrentSlotIndex, ItemSize);
+            CurrentSlotIndex = -1;
+        }
+
         _originalParent = transform.parent;
         transform.SetParent(transform.root);
         _canvasGroup.blocksRaycasts = false;
@@ -33,6 +40,13 @@ public class Std_ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         {
             transform.SetParent(_originalParent);
             transform.localPosition = Vector3.zero;
+
+            var dropSlot = _originalParent.GetComponent<Std_ItemDropHomeUI>();
+            if (dropSlot != null)
+            {
+                CurrentSlotIndex = dropSlot.SlotIndex;
+                StdInventoryManager.Instance.PlaceItem(CurrentSlotIndex, ItemSize);
+            }
         }
     }
 }

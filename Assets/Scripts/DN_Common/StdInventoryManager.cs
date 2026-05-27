@@ -6,11 +6,15 @@ public class StdInventoryManager : MonoBehaviour
 
     [SerializeField] private int[] _inventorySlots = new int[10];
 
-    private void Awake() { Instance = this; }
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     public bool CanPlaceItem(int startIndex, int size)
     {
-        if (startIndex + size > _inventorySlots.Length) return false;
+        if (startIndex < 0 || startIndex + size > _inventorySlots.Length) return false;
 
         for (int i = startIndex; i < startIndex + size; i++)
         {
@@ -23,7 +27,8 @@ public class StdInventoryManager : MonoBehaviour
     {
         for (int i = startIndex; i < startIndex + size; i++)
         {
-            _inventorySlots[i] = 1;
+            if (i >= 0 && i < _inventorySlots.Length)
+                _inventorySlots[i] = 1;
         }
     }
 
@@ -31,7 +36,8 @@ public class StdInventoryManager : MonoBehaviour
     {
         for (int i = startIndex; i < startIndex + size; i++)
         {
-            _inventorySlots[i] = 0;
+            if (i >= 0 && i < _inventorySlots.Length)
+                _inventorySlots[i] = 0;
         }
     }
 }

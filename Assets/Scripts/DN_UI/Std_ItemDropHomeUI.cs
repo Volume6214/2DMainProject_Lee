@@ -16,10 +16,8 @@ public class Std_ItemDropHomeUI : MonoBehaviour, IDropHandler
 
             item.transform.SetParent(this.transform);
             item.transform.localPosition = Vector3.zero;
-        }
-        else
-        {
-            Debug.Log("공간 부족!");
+
+            item.CurrentSlotIndex = SlotIndex;
         }
     }
 }
