@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Std_MainUITemp : MonoBehaviour
+public class Std_MainUITemp : DaniTechUIBase
 {
     [SerializeField] private DaniTechUIButton Button_StashInventory;
     [SerializeField] private DaniTechUIButton Button_Close_StashInventory;

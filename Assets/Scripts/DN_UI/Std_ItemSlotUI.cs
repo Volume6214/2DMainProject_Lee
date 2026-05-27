@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(CanvasGroup))]
-public class Std_ItemSlotUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class Std_ItemSlotUI : DaniTechUIBase, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Transform _originalParent;
     private CanvasGroup _canvasGroup;
