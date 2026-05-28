@@ -96,3 +96,23 @@ public class DNMonsterData : GameDataBase
     public string IconPath;
     public string PrefabPath;
 }
+
+[System.Serializable]
+public class StdItemData : GameDataBase
+{
+    public string Id;
+    public string Name;
+    public string Description;
+    public string ItemType;
+    public string Grade;
+    public string TriggerType;
+    public string ValueType1;
+    public string ValueType2;
+    public int Value1;
+    public int Value2;
+    public int ButPrice;
+    public int SellPrice;
+    public int Sizel;
+    public int CoolDonwn;
+    public string IconPath;
+}

@@ -4,6 +4,7 @@ public class Std_MainUITemp : DaniTechUIBase
 {
     [SerializeField] private DaniTechUIButton Button_StashInventory;
     [SerializeField] private DaniTechUIButton Button_Close_StashInventory;
+    [SerializeField] private GameObject StashInventory;
 
     private void OnEnable()
     {
@@ -13,11 +14,13 @@ public class Std_MainUITemp : DaniTechUIBase
 
     private void Onclick_StashInventory()
     {
-        DaniTechUIManager.Instance.OpenContentUI(DaniTechUIType.StashInventoryUI);
+        //DaniTechUIManager.Instance.OpenContentUI(DaniTechUIType.StashInventoryUI);
+        StashInventory.SetActive(true);
     }
 
     private void Onclick_CloseStashInventory()
     {
-        DaniTechUIManager.Instance.CloseContentUI(DaniTechUIType.StashInventoryUI);
+        //DaniTechUIManager.Instance.CloseContentUI(DaniTechUIType.StashInventoryUI);
+        StashInventory.SetActive(false);
     }
 }
