@@ -19,6 +19,7 @@ public static class DaniTechGameUtil
         DaniTechGameDataManager.Instance.LoadWeaponData("Weapon");
         DaniTechGameDataManager.Instance.LoadCostumeData("Costume");
         DaniTechGameDataManager.Instance.LoadDNItemData("DNItem");
+        DaniTechGameDataManager.Instance.LoadStdItemData("StdItem");
         DaniTechGameDataManager.Instance.LoadDNDialogueData();
         DaniTechGameDataManager.Instance.LoadAll();
     }

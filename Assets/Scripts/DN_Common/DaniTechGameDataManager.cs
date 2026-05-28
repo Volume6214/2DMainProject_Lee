@@ -106,6 +106,11 @@ public class DaniTechGameDataManager : MonoBehaviour
         ItemDataList = LoadData<DNItemData>(jsonPath);
     }
 
+    public void LoadStdItemData(string jsonPath)
+    {
+        StdItemDataList = LoadData<StdItemData>(jsonPath);
+    }
+
     public void LoadDNDialogueData()
     {
         DialogueGroupDataList = LoadData<DNDialogueGroupData>("DNDialogueGroup");
@@ -183,5 +188,12 @@ public class DaniTechGameDataManager : MonoBehaviour
         if (FieldObjectDataList == null || string.IsNullOrEmpty(dataId)) return null;
 
         return FieldObjectDataList.TryGetValue(dataId, out var data) ? data : null;
+    }
+
+    public StdItemData GetStdItemData(string id)
+    {
+        if (StdItemDataList == null || string.IsNullOrEmpty(id)) return null;
+
+        return StdItemDataList.TryGetValue(id, out var data) ? data : null;
     }
 }

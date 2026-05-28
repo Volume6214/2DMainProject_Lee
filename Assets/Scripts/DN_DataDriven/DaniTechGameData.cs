@@ -112,7 +112,7 @@ public class StdItemData : GameDataBase
     public int Value2;
     public int ButPrice;
     public int SellPrice;
-    public int Sizel;
+    public int Size;
     public int CoolDonwn;
     public string IconPath;
 }
