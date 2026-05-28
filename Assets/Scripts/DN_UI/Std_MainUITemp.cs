@@ -8,7 +8,7 @@ public class Std_MainUITemp : DaniTechUIBase
     private void OnEnable()
     {
         Button_StashInventory.BindOnClickButtonEvent(Onclick_StashInventory);
-        Button_Close_StashInventory.BindOnClickButtonEvent(Onclick_Close_StashInventory);
+        Button_Close_StashInventory.BindOnClickButtonEvent(Onclick_CloseStashInventory);
     }
 
     private void Onclick_StashInventory()
@@ -16,7 +16,7 @@ public class Std_MainUITemp : DaniTechUIBase
         DaniTechUIManager.Instance.OpenContentUI(DaniTechUIType.StashInventoryUI);
     }
 
-    private void Onclick_Close_StashInventory()
+    private void Onclick_CloseStashInventory()
     {
         DaniTechUIManager.Instance.CloseContentUI(DaniTechUIType.StashInventoryUI);
     }
