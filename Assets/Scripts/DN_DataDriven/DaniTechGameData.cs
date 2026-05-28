@@ -110,9 +110,9 @@ public class StdItemData : GameDataBase
     public string ValueType2;
     public int Value1;
     public int Value2;
-    public int ButPrice;
+    public int BuyPrice;
     public int SellPrice;
     public int Size;
-    public int CoolDonwn;
+    public int CoolDown;
     public string IconPath;
 }

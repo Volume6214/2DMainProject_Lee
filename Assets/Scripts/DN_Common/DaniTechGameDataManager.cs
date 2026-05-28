@@ -64,6 +64,7 @@ public class DaniTechGameDataManager : MonoBehaviour
 
             // 4. JsonUtility용 Wrapper 트릭 적용
             string wrappedJson = "{\"items\":" + jsonString + "}";
+
             SerializationWrapper<T> wrapper = JsonUtility.FromJson<SerializationWrapper<T>>(wrappedJson);
 
             if (wrapper != null && wrapper.items != null)
@@ -195,5 +196,12 @@ public class DaniTechGameDataManager : MonoBehaviour
         if (StdItemDataList == null || string.IsNullOrEmpty(id)) return null;
 
         return StdItemDataList.TryGetValue(id, out var data) ? data : null;
+    }
+
+    public List<StdItemData> GetAllStdItemData()
+    {
+        if (StdItemDataList == null) return new List<StdItemData>();
+
+        return StdItemDataList.Values.ToList();
     }
 }
