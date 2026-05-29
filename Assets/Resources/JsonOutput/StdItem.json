@@ -82,7 +82,7 @@
     "SellPrice": 3,
     "Size": 2,
     "CoolDown": 9,
-    "IconPath": "Icon/Icon_Item_Box_1"
+    "IconPath": "Icon/Icon_Item_Box_2"
   },
   {
     "Id": "Food_1_1002",
@@ -99,7 +99,7 @@
     "SellPrice": 1,
     "Size": 1,
     "CoolDown": 5,
-    "IconPath": "Icon/Icon_Item_Box_2"
+    "IconPath": "Icon/Icon_Item_Gold_2"
   },
   {
     "Id": "Food_2_1003",
@@ -116,7 +116,7 @@
     "SellPrice": 2,
     "Size": 2,
     "CoolDown": 8,
-    "IconPath": "Icon/Icon_Item_Gold_2"
+    "IconPath": "Icon/Icon_Item_Equip_Hat_2"
   },
   {
     "Id": "Tool_1_1001",
@@ -133,7 +133,7 @@
     "SellPrice": 1,
     "Size": 1,
     "CoolDown": 4,
-    "IconPath": "Icon/Icon_Item_Equip_Hat_2"
+    "IconPath": "Icon/Icon_Item_Corn"
   },
   {
     "Id": "Tool_1_1002",
@@ -150,7 +150,7 @@
     "SellPrice": 1,
     "Size": 1,
     "CoolDown": 4,
-    "IconPath": "Icon/Icon_Item_Corn"
+    "IconPath": "Icon/Icon_Item_Box_3"
   },
   {
     "Id": "Companion_1_1001",
@@ -167,7 +167,7 @@
     "SellPrice": 2,
     "Size": 1,
     "CoolDown": 3,
-    "IconPath": "Icon/Icon_Item_Box_2"
+    "IconPath": "Icon/Icon_Item_Gold_3"
   },
   {
     "Id": "Accessory_1_1001",
@@ -184,7 +184,7 @@
     "SellPrice": 1,
     "Size": 1,
     "CoolDown": 4,
-    "IconPath": "Icon/Icon_Item_Box_3"
+    "IconPath": "Icon/Icon_Item_Equip_Hat_3"
   },
   {
     "Id": "Toy_1_1001",
@@ -201,6 +201,6 @@
     "SellPrice": 1,
     "Size": 1,
     "CoolDown": 2,
-    "IconPath": "Icon/Icon_Item_Gold_3"
+    "IconPath": "Icon/Icon_Item_Corn"
   }
 ]

@@ -1,109 +1,183 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
-
-// ValueType1 : 아이템이 가진 벨류로 분류
-public enum EItemInfoCategoryLineX
-{
-    None = 0,
-    All,
-    DamageCategory,
-    ShieldCategory,
-    HealCategory,
-    RecoveryCategory,
-    DebuffPoisonCategory,
-    DebuffBurnCategory,
-}
-
-// ItemType : 아이템의 타입으로 분류
-public enum EItemInfoCategoryLineY
-{
-    None = 0,
-    All,
-    WeaponCategory,
-    CommonCategory,
-    ArmorCategory,
-    AccessoryCategory,
-    ConsumableCategory,
-    FoodCategory,
-    ArtifactCategory,
-    ToolCategory,
-}
+using UnityEngine.UI;
 
 public class Std_ItemInfoUI : DaniTechUIBase
 {
+    [Header("동적 생성할 프리팹")]
     [SerializeField] private GameObject _prefabSlot;
-    [SerializeField] private Transform _slotRoot;
 
-    private EItemInfoCategoryLineX _currentLineX = EItemInfoCategoryLineX.All;
-    private EItemInfoCategoryLineY _currentLineY = EItemInfoCategoryLineY.All;
+    [Header("디테일 정보 영역")]
+    [SerializeField] private Image Image_MainIcon;
+    [SerializeField] private Text Text_MainName;
+    [SerializeField] private Text Text_Description;
+
+    [Header("기타 정보")]
+    [SerializeField] private Transform _slotRoot;
+    [SerializeField] private DaniTechUIButton Button_CloseStdItemInfoUI;
+
+    [Header("상단 카테고리 버튼들")]
+    [SerializeField] private DaniTechUIButton Button_All;
+    [SerializeField] private DaniTechUIButton Button_Weapon;
+    [SerializeField] private DaniTechUIButton Button_Companion;
+    [SerializeField] private DaniTechUIButton Button_Armor;
+    [SerializeField] private DaniTechUIButton Button_Accessory;
+    [SerializeField] private DaniTechUIButton Button_Tool;
+    [SerializeField] private DaniTechUIButton Button_Consumable;
+    [SerializeField] private DaniTechUIButton Button_Food;
+    [SerializeField] private DaniTechUIButton Button_Artifact;
+    [SerializeField] private DaniTechUIButton Button_Toy;
 
     private Dictionary<string, Std_ItemInfoSlotUI> _slotList = new Dictionary<string, Std_ItemInfoSlotUI>();
 
-    public void OnClick_LineX(int index)
+    private void OnEnable()
     {
-        _currentLineX = (EItemInfoCategoryLineX)index;
-        RefreshItemList();
+        Button_All.BindOnClickButtonEvent(OnClick_All);
+        Button_Weapon.BindOnClickButtonEvent(OnClick_Weapon);
+        Button_Companion.BindOnClickButtonEvent(OnClick_Companion);
+        Button_Armor.BindOnClickButtonEvent(OnClick_Armor);
+        Button_Accessory.BindOnClickButtonEvent(OnClick_Accessory);
+        Button_Tool.BindOnClickButtonEvent(OnClick_Tool);
+        Button_Consumable.BindOnClickButtonEvent(OnClick_Consumable);
+        Button_Food.BindOnClickButtonEvent(OnClick_Food);
+        Button_Artifact.BindOnClickButtonEvent(OnClick_Artifact);
+        Button_Toy.BindOnClickButtonEvent(OnClick_Toy);
+
+        Button_CloseStdItemInfoUI.BindOnClickButtonEvent(OnClick_CloseStdItemInfoUI);
+
+        StartCoroutine(WaitForDataAndInitialize());
+
     }
 
-    public void OnClick_LineY(int index)
+    private void OnDisable()
     {
-        _currentLineY = (EItemInfoCategoryLineY)index;
-        RefreshItemList();
+        ClearAllSlots();
     }
 
-    private void RefreshItemList()
+    private void OnClick_All()
     {
-        DestroyAndClearSlotList();
+        FilterAndCreateSlots("All");
+    }
+    private void OnClick_Weapon()
+    {
+        FilterAndCreateSlots("Weapon");
+    }
+    private void OnClick_Companion()
+    {
+        FilterAndCreateSlots("Companion");
+    }
+    private void OnClick_Armor()
+    {
+        FilterAndCreateSlots("Armor");
+    }
+    private void OnClick_Accessory()
+    {
+        FilterAndCreateSlots("Accessory");
+    }
+    private void OnClick_Tool()
+    {
+        FilterAndCreateSlots("Tool");
+    }
+    private void OnClick_Consumable()
+    {
+        FilterAndCreateSlots("Consumable");
+    }
+    private void OnClick_Food()
+    {
+        FilterAndCreateSlots("Food");
+    }
+    private void OnClick_Artifact()
+    {
+        FilterAndCreateSlots("Artifact");
+    }
+    private void OnClick_Toy()
+    {
+        FilterAndCreateSlots("Toy");
+    }
 
-        // 매니저에서 전체 아이템 리스트를 가져옴
-        var allItems = DaniTechGameDataManager.Instance.GetAllStdItemData(); 
+    public void OnClick_CloseStdItemInfoUI()
+    {
+        Debug.Log("Close 버튼 클릭됨!");
+        DaniTechUIManager.Instance.CloseContentUI(DaniTechUIType.Std_ItemInfoUI);
+    }
 
-        foreach (var data in allItems)
+    private System.Collections.IEnumerator WaitForDataAndInitialize()
+    {
+        while (DaniTechGameDataManager.Instance == null ||
+               DaniTechGameDataManager.Instance.StdItemDataList == null)
         {
-            // 필터링 로직: All이거나 타입이 일치하면 true
-            bool isMatchX = (_currentLineX == EItemInfoCategoryLineX.All) || (data.ValueType1 == _currentLineX.ToString());
-            bool isMatchY = (_currentLineY == EItemInfoCategoryLineY.All) || (data.ItemType == _currentLineY.ToString());
+            yield return null; 
+        }
 
-            if (isMatchX && isMatchY)
-            {
-                CreateSlot(data);
-            }
+        FilterAndCreateSlots("All");
+    }
+
+    private void FilterAndCreateSlots(string targetType)
+    {
+        ClearAllSlots();
+        var allDataList = DaniTechGameDataManager.Instance.StdItemDataList;
+
+        if (allDataList == null) return;
+
+        foreach (var dataKv in allDataList)
+        {
+            var data = dataKv.Value;
+            if (data == null) continue;
+            if (targetType != "All" && data.ItemType != targetType) continue;
+
+            CreateSlot(data);
         }
     }
 
     private void CreateSlot(StdItemData data)
     {
+        if (_prefabSlot == null) return;
+
         var gObj = Instantiate(_prefabSlot, _slotRoot);
-        var slotComponent = gObj.GetComponent<Std_ItemInfoSlotUI>();
+        var slot = gObj.GetComponent<Std_ItemInfoSlotUI>();
 
-        if (slotComponent != null)
+        if (slot != null)
         {
-            slotComponent.InitSlot(data, OnClickChildSlotSelected);
+            slot.InitSlot(data, OnSlotSelected);
+            _slotList.Add(data.Id, slot);
 
-            _slotList.Add(data.Id, slotComponent);
+            Debug.Log($"슬롯 생성 완료: {data.Name}, Slot Component: {slot != null}");
+        }
+        else
+        {
+            Debug.LogError("생성된 슬롯에 Std_ItemInfoSlotUI 컴포넌트가 없습니다!");
         }
     }
 
-    private void DestroyAndClearSlotList()
+    private void OnSlotSelected(StdItemData data)
     {
+        Debug.Log($"[디테일 갱신] 아이템 이름: {data.Name}, 설명: {data.Description}");
+        Text_MainName.text = data.Name;
+        Text_Description.text = data.Description;
+
+        if (!string.IsNullOrEmpty(data.IconPath))
+        {
+            DaniTechGameUtil.LoadAndSetSpriteImage(Image_MainIcon, data.IconPath).Forget();
+        }
+        Image_MainIcon.gameObject.SetActive(!string.IsNullOrEmpty(data.IconPath));
+
         foreach (var slot in _slotList.Values)
         {
-            if (slot != null) DestroyImmediate(slot.gameObject);
+            slot.SetSelectedUI(false);
+        }
+        if (_slotList.ContainsKey(data.Id))
+            _slotList[data.Id].SetSelectedUI(true);
+    }
+
+    private void ClearAllSlots()
+    {
+        foreach (Transform child in _slotRoot)
+        {
+            Destroy(child.gameObject);
         }
         _slotList.Clear();
     }
 
-    private void OnClickChildSlotSelected(string slotDataId)
-    {
-        // 1. 선택된 아이템의 상세 정보 표시 로직
-        var data = DaniTechGameDataManager.Instance.GetStdItemData(slotDataId);
-        if (data == null) return;
-        Debug.Log($"선택한 아이템: {data.Name}");
 
-        // 2. 선택된 슬롯 UI 효과 처리
-        foreach (var slot in _slotList.Values)
-        {
-            slot.SetSelectedUI(slot.GetSlotDataId() == slotDataId);
-        }
-    }
 }

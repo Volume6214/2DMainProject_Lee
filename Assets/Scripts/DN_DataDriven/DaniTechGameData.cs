@@ -100,7 +100,7 @@ public class DNMonsterData : GameDataBase
 [System.Serializable]
 public class StdItemData : GameDataBase
 {
-    public string Id;
+    // public string Id;
     public string Name;
     public string Description;
     public string ItemType;
